@@ -11,7 +11,7 @@ import { links } from "../lib/internal-links";
 
 export const metadata: Metadata = {
   title: "Costs & Finance | Transparent Pricing",
-  description: "Explore treatment costs at Oldham Orthodontics. Clear, all-inclusive pricing with 0% interest finance plans and weekly payment options. Book your free consultation today.",
+  description: "Explore treatment costs at Oldham Orthodontics. Clear, all-inclusive pricing with 0% interest finance and monthly payment plans. Book your free consultation today.",
 };
 
 const NAVY = "#1a1a3e";
@@ -117,7 +117,7 @@ export default function CostsPage() {
         title="Spread the cost with 0% finance"
         paragraphs={[
           "We know orthodontic treatment is a significant decision, financially as well as personally. Our 0% interest finance plans let you spread the total cost across the length of your treatment, with no extra charge added on top.",
-          "Most patients pay an initial deposit and then a fixed weekly or monthly amount until the balance is cleared - treatment fees start from around £50 per week, with longer plans available for more complex cases. We'll always work out an arrangement that fits your budget.",
+          "Most patients pay an initial deposit of £750 and then fixed monthly payments of £300 until the balance is cleared, with longer plans available for more complex cases. We'll always work out an arrangement that fits your budget.",
           "Bringing more than one family member in for treatment? We offer family and sibling discounts on combined treatment plans - just mention it at consultation and we'll factor it in.",
         ]}
         image="/images/costs-finance.webp"

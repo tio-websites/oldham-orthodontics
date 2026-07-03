@@ -682,12 +682,12 @@ export default function Home() {
             </ul>
             <div className="cost-price-card">
               <div className="cost-price-left">
-                <div className="cost-price-label">Start from only</div>
-                <div className="cost-price-amount">£50 <span>/week</span></div>
+                <div className="cost-price-label">Monthly payments</div>
+                <div className="cost-price-amount">£300 <span>/month</span></div>
               </div>
               <div className="cost-price-right">
                 <div className="cost-price-heading">Spread the cost</div>
-                <div className="cost-price-desc">With our interest-free finance plans.</div>
+                <div className="cost-price-desc">£750 deposit, then 0% interest instalments.</div>
               </div>
             </div>
             <div style={{ textAlign: "center", marginTop: "32px" }}>
