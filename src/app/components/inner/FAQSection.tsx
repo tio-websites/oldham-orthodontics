@@ -1,8 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 type FAQ = { question: string; answer: React.ReactNode };
+
+// Recursively flatten a ReactNode (answers often contain JSX with <a> links)
+// to plain text for FAQPage structured data.
+function nodeToText(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeToText).join("");
+  if (React.isValidElement(node)) {
+    return nodeToText((node.props as { children?: React.ReactNode }).children);
+  }
+  return "";
+}
 
 type FAQSectionProps = {
   label?: string;
@@ -39,8 +51,25 @@ export default function FAQSection({
   description = "Find answers to the most common questions about orthodontic treatment.",
   faqs,
 }: FAQSectionProps) {
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: nodeToText(f.question).trim(),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: nodeToText(f.answer).trim(),
+      },
+    })),
+  };
+
   return (
     <section className="faq-section">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="faq-container">
         <div className="faq-header">
           <span className="faq-label">{label}</span>

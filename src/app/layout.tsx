@@ -5,6 +5,8 @@ import "./globals.css";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
 import VisitSection from "./components/VisitSection";
+import CookieConsent from "./components/CookieConsent";
+import Analytics from "./components/Analytics";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -89,6 +91,20 @@ const practiceSchema = {
   sameAs: [
     "https://www.facebook.com/OldhamOrthodontics",
     "https://www.youtube.com/channel/UC6v5MtYOziWoEu9ZU6TH9gA",
+    "https://twitter.com/OrthoOldham",
+  ],
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Oldham Orthodontics",
+  url: "https://oldhamorthodontics.co.uk",
+  logo: "https://oldhamorthodontics.co.uk/images/oldham-logo.png",
+  sameAs: [
+    "https://www.facebook.com/OldhamOrthodontics",
+    "https://www.youtube.com/channel/UC6v5MtYOziWoEu9ZU6TH9gA",
+    "https://twitter.com/OrthoOldham",
   ],
 };
 
@@ -108,10 +124,16 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(practiceSchema) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <SiteHeader />
         {children}
         <VisitSection />
         <SiteFooter />
+        <CookieConsent />
+        <Analytics />
       </body>
     </html>
   );
