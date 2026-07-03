@@ -58,13 +58,13 @@ function AnimatedElement({
 
 // Team data
 const teamMembers = [
-  { name: "Dr Ovais Malik", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male", image: "https://cdn.shopify.com/s/files/1/0858/4382/files/IMG_3769_1_1.jpg" },
-  { name: "Dr Sarah Glossop", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "female" },
-  { name: "Hamza Anwar", role: "SPECIALIST ORTHODONTIST", gender: "male" },
-  { name: "Dr Nadia Stivaros", role: "SPECIALIST IN ORTHODONTICS", gender: "female" },
-  { name: "Dr Samer Salam", role: "SPECIALIST IN ORTHODONTICS", gender: "male" },
-  { name: "Dr Simon Watkinson", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male" },
-  { name: "Dr Richard Needham", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male" },
+  { name: "Dr Ovais Malik", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/ovais-malik.webp" },
+  { name: "Dr Sarah Glossop", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "female", image: "/images/team/sarah-glossop.webp" },
+  { name: "Hamza Anwar", role: "SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/hamza-anwar.webp" },
+  { name: "Dr Nadia Stivaros", role: "SPECIALIST IN ORTHODONTICS", gender: "female", image: "/images/team/nadia-stivaros.webp" },
+  { name: "Dr Samer Salam", role: "SPECIALIST IN ORTHODONTICS", gender: "male", image: "/images/team/samer-salam.webp" },
+  { name: "Dr Simon Watkinson", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/simon-watkinson.webp" },
+  { name: "Dr Richard Needham", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/richard-needham.webp" },
 ];
 
 // Team Section with carousel
