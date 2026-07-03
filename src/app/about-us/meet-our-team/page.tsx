@@ -56,13 +56,12 @@ const teamMembers = [
     image: "/images/team/nadia-stivaros.webp",
   },
   {
-    name: "Dr Samer Salam",
-    role: "Specialist in Orthodontics",
-    gdcNumber: "72139",
-    bio: "Samer qualified from the University of Manchester Dental Hospital in 1996 and gained Membership of the Faculty of Dental Surgery at the Royal College of Surgeons of Edinburgh in 2004. He completed his specialist orthodontic training in 2008 alongside a Master of Philosophy from the University of Manchester.",
-    fullBio:
-      "Samer qualified as a dentist from the University of Manchester Dental Hospital in 1996 and then worked in general practice for 6 years.\n\nHe gained Membership of the Faculty of Dental Surgery from the Royal College of Surgeons of Edinburgh in 2004. Following various hospital posts Samer joined the orthodontic specialist registrar training programme in Manchester in 2005.\n\nHe completed his specialist training in 2008 and also gained a Master of Philosophy from the University of Manchester.",
-    image: "/images/team/samer-salam.webp",
+    // DRAFT — replaces Dr Samer Salam (BugHerd #6/#7). Awaiting Rehan Alam's
+    // confirmed title, GDC number and bio from the practice before this goes final.
+    name: "Dr Rehan Alam",
+    role: "Specialist Orthodontist",
+    bio: "DRAFT - full profile to follow. Dr Rehan Alam has recently joined the specialist orthodontic team at Oldham Orthodontics.",
+    image: "/images/team/rehan-alam.webp",
   },
   {
     name: "Dr Simon Watkinson",

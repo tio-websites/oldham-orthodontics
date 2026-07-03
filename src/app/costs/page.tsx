@@ -70,6 +70,46 @@ export default function CostsPage() {
         benefits={included}
       />
 
+      <SectionDivider from={WHITE} to={WARM} />
+
+      <section className="price-guide">
+        <div className="price-guide-inner">
+          <span className="price-guide-label">GUIDE PRICES</span>
+          <h2>Treatment costs at a glance</h2>
+          <p className="price-guide-intro">
+            To help you plan, here are our guide prices. Because every case is different, the figures below are starting points - your exact cost is confirmed in a personalised written quote at your <Link href={links.freeConsultation}>free consultation</Link>. Most treatments can be spread over 0% interest finance (see below).
+          </p>
+
+          <table className="price-table">
+            <caption>TREATMENTS</caption>
+            <tbody>
+              <tr><td>Single arch &ndash; metal braces</td><td className="price-amount">from &pound;2,750</td></tr>
+              <tr><td>Single arch &ndash; Clarity&trade; ceramic braces</td><td className="price-amount">from &pound;2,970</td></tr>
+              <tr><td>Both arches &ndash; metal braces</td><td className="price-amount">from &pound;3,872</td></tr>
+              <tr><td>Both arches &ndash; Clarity&trade; ceramic braces</td><td className="price-amount">from &pound;4,356</td></tr>
+              <tr><td>Invisalign&reg; clear aligners</td><td className="price-amount">from &pound;4,950</td></tr>
+              <tr><td>Lingual (hidden) braces</td><td className="price-amount">from &pound;6,100</td></tr>
+              <tr><td>Lingual Lite</td><td className="price-amount">from &pound;4,500</td></tr>
+              <tr><td>Removable appliances</td><td className="price-amount">from &pound;950</td></tr>
+            </tbody>
+          </table>
+
+          <table className="price-table" style={{ marginTop: "28px" }}>
+            <caption>RETAINERS, WHITENING &amp; EXTRAS</caption>
+            <tbody>
+              <tr><td>Teeth whitening</td><td className="price-amount">&pound;325</td></tr>
+              <tr><td>Bonded (fixed) retainer</td><td className="price-amount">from &pound;195</td></tr>
+              <tr><td>Essix (removable) retainer</td><td className="price-amount">&pound;140</td></tr>
+              <tr><td>Replacement appliance (NHS)</td><td className="price-amount">&pound;99.63</td></tr>
+            </tbody>
+          </table>
+
+          <p className="price-guide-note">
+            Guide prices correct as of April 2026 and subject to change. Final costs are confirmed in your written treatment plan following consultation.
+          </p>
+        </div>
+      </section>
+
       <ContentSection
         alt
         imagePosition="right"

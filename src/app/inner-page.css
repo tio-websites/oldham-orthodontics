@@ -1081,6 +1081,104 @@
   line-height: 1.7;
 }
 
+/* Guide Prices */
+.price-guide {
+  padding: 100px 0;
+  background: var(--warm, #faf7f4);
+}
+
+.price-guide-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.price-guide-label {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.price-guide-inner > h2 {
+  font-size: 42px;
+  font-weight: 400;
+  color: var(--navy);
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.price-guide-intro {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.8;
+  max-width: 800px;
+  margin-bottom: 40px;
+}
+
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(26, 26, 62, 0.06);
+}
+
+.price-table caption {
+  caption-side: top;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--navy);
+  padding: 28px 28px 4px;
+}
+
+.price-table th,
+.price-table td {
+  text-align: left;
+  padding: 16px 28px;
+  font-size: 15px;
+  color: var(--text);
+  border-bottom: 1px solid #efe9e2;
+}
+
+.price-table td.price-amount {
+  text-align: right;
+  white-space: nowrap;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.price-table tr:last-child td {
+  border-bottom: none;
+}
+
+.price-guide-note {
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.8;
+  line-height: 1.7;
+  margin-top: 24px;
+}
+
+@media (max-width: 640px) {
+  .price-guide-inner {
+    padding: 0 24px;
+  }
+  .price-guide-inner > h2 {
+    font-size: 32px;
+  }
+  .price-table th,
+  .price-table td {
+    padding: 14px 18px;
+    font-size: 14px;
+  }
+}
+
 /* Video Section */
 .video-section {
   position: relative;
