@@ -20,7 +20,7 @@ export default function NotFound() {
         background: "#faf7f4",
       }}
     >
-      <p style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2, color: "#e8a44a", marginBottom: 16 }}>
+      <p style={{ fontSize: 15, fontWeight: 700, letterSpacing: 2, color: "#C6A355", marginBottom: 16 }}>
         ERROR 404
       </p>
       <h1 style={{ fontSize: 42, fontWeight: 400, color: "#1a1a3e", marginBottom: 20, lineHeight: 1.2 }}>

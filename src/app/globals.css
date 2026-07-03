@@ -3033,7 +3033,7 @@ section {
 }
 
 .cookie-consent-text a {
-  color: var(--accent, #e8a44a);
+  color: var(--gold-start, #D4B86A);
   text-decoration: underline;
 }
 
@@ -3064,8 +3064,9 @@ section {
 }
 
 .cookie-btn-accept {
-  background: var(--accent, #e8a44a);
-  color: var(--navy, #1a1a3e);
+  background: linear-gradient(135deg, var(--gold-start, #D4B86A) 0%, var(--gold-mid, #C6A355) 50%, var(--gold-end, #A8893E) 100%);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(198, 163, 85, 0.35);
 }
 
 @media (max-width: 480px) {
