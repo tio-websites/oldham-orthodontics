@@ -56,11 +56,12 @@ const teamMembers = [
     image: "/images/team/nadia-stivaros.webp",
   },
   {
-    // DRAFT — replaces Dr Samer Salam (BugHerd #6/#7). Awaiting Rehan Alam's
-    // confirmed title, GDC number and bio from the practice before this goes final.
+    // Replaces Dr Samer Salam (BugHerd #6/#7). Live without a bio at the
+    // practice's request (Rehan on holiday); profile to follow.
     name: "Dr Rehan Alam",
-    role: "Specialist Orthodontist",
-    bio: "DRAFT - full profile to follow. Dr Rehan Alam has recently joined the specialist orthodontic team at Oldham Orthodontics.",
+    role: "Principal Dentist",
+    gdcNumber: "255246",
+    bio: "BDS, MFDS RCS (Edinburgh), with a PG Cert in Restorative and Aesthetic Dentistry (London). A fuller profile will follow soon.",
     image: "/images/team/rehan-alam.webp",
   },
   {

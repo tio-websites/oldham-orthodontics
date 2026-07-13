@@ -62,7 +62,7 @@ const teamMembers = [
   { name: "Dr Sarah Glossop", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "female", image: "/images/team/sarah-glossop.webp" },
   { name: "Hamza Anwar", role: "SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/hamza-anwar.webp" },
   { name: "Dr Nadia Stivaros", role: "SPECIALIST IN ORTHODONTICS", gender: "female", image: "/images/team/nadia-stivaros.webp" },
-  { name: "Dr Rehan Alam", role: "SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/rehan-alam.webp" },
+  { name: "Dr Rehan Alam", role: "PRINCIPAL DENTIST", gender: "male", image: "/images/team/rehan-alam.webp" },
   { name: "Dr Simon Watkinson", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/simon-watkinson.webp" },
   { name: "Dr Richard Needham", role: "CONSULTANT & SPECIALIST ORTHODONTIST", gender: "male", image: "/images/team/richard-needham.webp" },
 ];
