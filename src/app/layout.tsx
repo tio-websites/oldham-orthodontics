@@ -23,7 +23,9 @@ export const metadata: Metadata = {
   description: "Modern braces and advanced aligner treatments delivered by experienced, trusted orthodontists in a warm and welcoming practice in Oldham. Book your free consultation today.",
   icons: {
     icon: "/favicon.ico",
+    apple: "/apple-icon.png",
   },
+  manifest: "/manifest.webmanifest",
   openGraph: {
     type: "website",
     locale: "en_GB",
