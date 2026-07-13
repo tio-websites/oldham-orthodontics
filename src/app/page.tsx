@@ -109,11 +109,11 @@ function TeamSection() {
         <div className="team-content">
           <div className="section-label">Meet The Team</div>
           <h2 className="team-title">
-            <span className="team-title-line1">Specialist Orthodontists</span>
+            <span className="team-title-line1">Our Clinical Team</span>
             <span className="team-title-line2">Dedicated To Exceptional Care</span>
           </h2>
           <p className="team-description">
-            With decades of combined experience, our Specialist Orthodontist team
+            With decades of combined experience, our specialist-led clinical team
             is here to help you achieve a straighter smile - whether you&apos;re
             considering aligners, braces, or other treatments. No matter your
             starting point or goals, you&apos;ll be in safe, trusted hands.
@@ -682,12 +682,12 @@ export default function Home() {
             </ul>
             <div className="cost-price-card">
               <div className="cost-price-left">
-                <div className="cost-price-label">Monthly payments</div>
-                <div className="cost-price-amount">£300 <span>/month</span></div>
+                <div className="cost-price-label">Interest-free finance</div>
+                <div className="cost-price-amount">0% <span>APR</span></div>
               </div>
               <div className="cost-price-right">
                 <div className="cost-price-heading">Spread the cost</div>
-                <div className="cost-price-desc">£750 deposit, then 0% interest instalments.</div>
+                <div className="cost-price-desc">0% interest-free credit available through Buyline. See our costs page for representative examples.</div>
               </div>
             </div>
             <div style={{ textAlign: "center", marginTop: "32px" }}>

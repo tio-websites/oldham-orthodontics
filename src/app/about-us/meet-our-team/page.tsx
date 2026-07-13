@@ -96,7 +96,7 @@ export default function MeetOurTeamPage() {
             <span>behind every smile</span>
           </>
         }
-        description="Every treatment plan at Oldham Orthodontics is led by a Specialist Orthodontist - clinicians who have completed years of additional training beyond general dentistry, focused solely on straightening teeth and correcting bites. Here's the team you'll meet when you visit."
+        description="Orthodontic treatment at Oldham Orthodontics is led by Specialist Orthodontists - clinicians who have completed years of additional training beyond general dentistry, focused solely on straightening teeth and correcting bites - supported by our wider clinical team. Here's who you'll meet when you visit."
         ctaText="Arrange your free consultation"
         image="/images/about-us-hero.webp"
         imageAlt="The welcoming reception of the Oldham Orthodontics practice"
@@ -119,7 +119,7 @@ export default function MeetOurTeamPage() {
       <SectionDivider from={WHITE} to={WARM} />
 
       <TeamGrid
-        title="Our Specialist Orthodontists"
+        title="Meet the clinical team"
         description="Meet the team you'll be in safe hands with - from your first free consultation through to your final smile."
         members={teamMembers}
         showCta={false}

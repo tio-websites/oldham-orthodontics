@@ -114,15 +114,57 @@ export default function CostsPage() {
         alt
         imagePosition="right"
         label="FINANCE OPTIONS"
-        title="Spread the cost with 0% finance"
+        title="Spread the cost with Buyline finance"
         paragraphs={[
-          "We know orthodontic treatment is a significant decision, financially as well as personally. Our 0% interest finance plans let you spread the total cost across the length of your treatment, with no extra charge added on top.",
-          "Most patients pay an initial deposit of £750 and then fixed monthly payments of £300 until the balance is cleared, with longer plans available for more complex cases. We'll always work out an arrangement that fits your budget.",
+          "We know orthodontic treatment is a significant decision, financially as well as personally. Through our finance partner Buyline, you can spread the cost of treatment over manageable monthly payments.",
+          "We offer interest-free credit (0% APR) on many plans, plus longer Pay Monthly options (13.9% APR representative) for larger or extended treatments. Representative examples are shown below, and your consultant will confirm the exact terms for your treatment.",
           "Bringing more than one family member in for treatment? We offer family and sibling discounts on combined treatment plans - just mention it at consultation and we'll factor it in.",
         ]}
         image="/images/costs-finance.webp"
         imageAlt="A couple reviewing finance paperwork together at home"
       />
+
+      <section className="price-guide">
+        <div className="price-guide-inner">
+          <span className="price-guide-label">FINANCE &ndash; REPRESENTATIVE EXAMPLES</span>
+          <h2>Finance with Buyline</h2>
+          <p className="price-guide-intro">
+            Finance is provided by Buyline. Below are representative examples for our two payment options - the exact figures for your plan depend on your treatment cost and chosen term, and will be confirmed at your consultation.
+          </p>
+
+          <table className="price-table">
+            <caption>INTEREST-FREE CREDIT &ndash; 0% APR</caption>
+            <tbody>
+              <tr><td>Purchase amount</td><td className="price-amount">&pound;1,200.00</td></tr>
+              <tr><td>Deposit</td><td className="price-amount">&pound;150.00</td></tr>
+              <tr><td>Total amount of credit</td><td className="price-amount">&pound;1,050.00</td></tr>
+              <tr><td>Length of agreement</td><td className="price-amount">18 months</td></tr>
+              <tr><td>Monthly repayment</td><td className="price-amount">&pound;58.33</td></tr>
+              <tr><td>Total charge for credit</td><td className="price-amount">&pound;0.00</td></tr>
+              <tr><td>Total repayable</td><td className="price-amount">&pound;1,050.00</td></tr>
+              <tr><td>Representative APR</td><td className="price-amount">0% (fixed)</td></tr>
+            </tbody>
+          </table>
+
+          <table className="price-table" style={{ marginTop: "28px" }}>
+            <caption>PAY MONTHLY &ndash; 13.9% APR REPRESENTATIVE</caption>
+            <tbody>
+              <tr><td>Purchase amount</td><td className="price-amount">&pound;7,600.00</td></tr>
+              <tr><td>Deposit</td><td className="price-amount">&pound;260.00</td></tr>
+              <tr><td>Total amount of credit</td><td className="price-amount">&pound;7,340.00</td></tr>
+              <tr><td>Length of agreement</td><td className="price-amount">48 months</td></tr>
+              <tr><td>Monthly repayment</td><td className="price-amount">&pound;197.21</td></tr>
+              <tr><td>Total charge for credit</td><td className="price-amount">&pound;2,126.08</td></tr>
+              <tr><td>Total repayable</td><td className="price-amount">&pound;9,726.08</td></tr>
+              <tr><td>Representative APR</td><td className="price-amount">13.9% (fixed)</td></tr>
+            </tbody>
+          </table>
+
+          <p className="price-guide-note">
+            Finance is subject to status and affordability; terms and conditions apply. Credit is provided by Buyline. Representative examples are for illustration only.
+          </p>
+        </div>
+      </section>
 
       <SectionDivider from={WHITE} to={NAVY} variant="into-cta" />
 
