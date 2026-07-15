@@ -1337,57 +1337,6 @@
   color: #fff;
 }
 
-.fc-quote-open {
-  width: 100%;
-}
-
-.fc-quote-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.fc-quote-form input {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  font-size: 14px;
-}
-
-.fc-quote-form input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.fc-quote-form .btn {
-  width: 100%;
-}
-
-.fc-quote-privacy {
-  font-size: 12px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.65);
-}
-
-.fc-quote-privacy a {
-  color: var(--accent, #e8a44a);
-  text-decoration: underline;
-}
-
-.fc-quote-thanks h3 {
-  font-size: 18px;
-  color: #fff;
-  margin-bottom: 8px;
-}
-
-.fc-quote-thanks p {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.75);
-  line-height: 1.6;
-}
-
 .fc-disclaimer {
   margin-top: 28px;
   font-size: 12px;

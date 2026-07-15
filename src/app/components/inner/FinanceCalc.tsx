@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
-import { submitPrmForm } from "@/app/lib/formSubmit";
+import { useMemo, useState } from "react";
 
 // Buyline finance calculator for Oldham Orthodontics.
 // Two products (figures supplied by the practice / Buyline):
@@ -13,13 +12,6 @@ import { submitPrmForm } from "@/app/lib/formSubmit";
 // available terms + minimum deposit per product with Buyline.
 
 const PAY_MONTHLY_APR = 0.139;
-
-// PRM routing — mirrors the working contact form so calculator leads land in
-// the same PRM inbox, tagged as a finance-calculator enquiry.
-const PRM_ACCOUNT_ID = process.env.NEXT_PUBLIC_PRM_ACCOUNT_ID || "";
-const PRM_WEB_FORM = "wf/nyw6lrrwpd/bdba9cd293355d512336";
-const EMAIL_LOCAL_PART = "info";
-const EMAIL_DOMAIN = "oldhamorthodontics.co.uk";
 
 type Plan = "interest-free" | "pay-monthly";
 
@@ -143,9 +135,6 @@ export default function FinanceCalc() {
               <div><dt>Total repayable</dt><dd>&pound;{money(totalRepayable)}</dd></div>
               <div><dt>Representative APR</dt><dd>{cfg.aprLabel} (fixed)</dd></div>
             </dl>
-            <QuoteForm
-              summary={`Finance calculator enquiry — ${cfg.label}. Treatment £${money(cost)}, deposit £${money(safeDeposit)}, ${months} months, est. £${money(monthly)}/month, total repayable £${money(totalRepayable)}, ${cfg.aprLabel} APR.`}
-            />
           </div>
         </div>
 
@@ -160,108 +149,6 @@ export default function FinanceCalc() {
         </p>
       </div>
     </section>
-  );
-}
-
-function QuoteForm({ summary }: { summary: string }) {
-  const [open, setOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (submitting) return;
-    setError(null);
-    setSubmitting(true);
-    const result = await submitPrmForm(e.currentTarget);
-    if (result.success) {
-      setSent(true);
-      return;
-    }
-    setError(result.error ?? "Something went wrong. Please try again.");
-    setSubmitting(false);
-  }
-
-  if (sent) {
-    return (
-      <div className="fc-quote-thanks">
-        <h3>Thanks - your estimate is on its way to the team.</h3>
-        <p>We&apos;ll be in touch to talk through your options. Exact terms are confirmed with Buyline.</p>
-      </div>
-    );
-  }
-
-  if (!open) {
-    return (
-      <button type="button" className="btn btn-accent fc-quote-open" onClick={() => setOpen(true)}>
-        Request this estimate
-      </button>
-    );
-  }
-
-  return (
-    <form className="fc-quote-form" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="firstname"
-        placeholder="Your name"
-        aria-label="Your name"
-        autoComplete="name"
-        minLength={2}
-        maxLength={80}
-        required
-      />
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        aria-label="Email"
-        autoComplete="email"
-        maxLength={120}
-        required
-      />
-      <input
-        type="tel"
-        name="phone"
-        placeholder="Phone"
-        aria-label="Phone"
-        autoComplete="tel"
-        pattern="[\d\s+()\-]{6,}"
-        minLength={6}
-        maxLength={20}
-        required
-      />
-
-      {/* carries the calculated estimate into the enquiry */}
-      <textarea name="message" defaultValue={summary} readOnly hidden />
-
-      {/* Honeypots (match formSubmit.ts) */}
-      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", height: 0, width: 0, overflow: "hidden" }}>
-        <input type="text" name="oo_hp_a" tabIndex={-1} autoComplete="off" defaultValue="" />
-        <input type="text" name="oo_hp_b" tabIndex={-1} autoComplete="off" defaultValue="" />
-      </div>
-
-      {/* PRM routing — mirrors the contact form */}
-      <input type="hidden" name="lastname" defaultValue="." />
-      <input type="hidden" name="accountid" defaultValue={PRM_ACCOUNT_ID} />
-      <input type="hidden" name="wf" defaultValue={PRM_WEB_FORM} />
-      <input type="hidden" name="prm-note" value="prm-note" />
-      <input type="hidden" name="page_name" value="costs-calculator" />
-      <input type="hidden" name="gdpr" value="gdpr" />
-      <input type="hidden" name="email_subject" value="Oldham Orthodontics — Finance calculator enquiry" />
-      <input type="hidden" name="gdpr_email_subject" value="Oldham Orthodontics — Finance calculator enquiry (GDPR)" />
-      <input type="hidden" name="local_part[0]" value={EMAIL_LOCAL_PART} />
-      <input type="hidden" name="domain[0]" value={EMAIL_DOMAIN} />
-
-      <p className="fc-quote-privacy">
-        We&apos;ll only use your details to respond to this enquiry. See our <a href="/privacy-policy">privacy policy</a>.
-      </p>
-      {error && <p className="form-error" role="alert">{error}</p>}
-      <button type="submit" className="btn btn-accent" disabled={submitting}>
-        {submitting ? "Sending…" : "Send my estimate"}
-      </button>
-    </form>
   );
 }
 
