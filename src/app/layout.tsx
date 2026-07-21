@@ -118,6 +118,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserrat.variable} antialiased`}>
+        {/* Google Tag Manager (noscript) — first-party via GTG. JS-disabled fallback. */}
+        <noscript>
+          <iframe
+            src="/v2ur/ns.html?id=GTM-TRC7LX45"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+            title="gtm"
+          />
+        </noscript>
         <Script
           src="https://www.bugherd.com/sidebarv2.js?apikey=m0sczixxlaa9gfw9pygzya"
           strategy="afterInteractive"
@@ -136,6 +146,8 @@ export default function RootLayout({
         <SiteFooter />
         <CookieConsent />
         <Analytics />
+        {/* PRM/GA4 attribution — feeds custom14–custom20 on form.ajax_form submit. */}
+        <Script src="/js/prm-attribution.js" strategy="afterInteractive" />
       </body>
     </html>
   );

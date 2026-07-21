@@ -144,7 +144,7 @@ export default function FreeConsultationPage() {
               Meet our Specialist Orthodontists, talk through your goals, and discover the
               right treatment for you. There&apos;s no pressure - just expert advice and a clear plan.
             </p>
-            <form className="booking-form" onSubmit={handleSubmit} onBlur={handleFieldBlur}>
+            <form className="booking-form ajax_form" onSubmit={handleSubmit} onBlur={handleFieldBlur}>
               <input
                 type="text"
                 name="firstname"

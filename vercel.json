@@ -1,0 +1,17 @@
+{
+  "rewrites": [
+    {
+      "source": "/v2ur/:path*",
+      "destination": "https://gtm-trc7lx45.fps.goog/v2ur/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/v2ur/:path*",
+      "headers": [
+        { "key": "Host", "value": "gtm-trc7lx45.fps.goog" },
+        { "key": "X-Gtg-Developer-Id", "value": "dMjAzY2" }
+      ]
+    }
+  ]
+}

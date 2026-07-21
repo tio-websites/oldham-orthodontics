@@ -151,7 +151,7 @@ export default function ReferralForm() {
   }
 
   return (
-    <form className="referral-form" onSubmit={handleSubmit} onBlur={handleFieldBlur}>
+    <form className="referral-form ajax_form" onSubmit={handleSubmit} onBlur={handleFieldBlur}>
       <div className="referral-fieldset">
         <h3>Dentist&apos;s details</h3>
         <div className="referral-grid">

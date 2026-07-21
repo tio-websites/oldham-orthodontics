@@ -120,7 +120,7 @@ export default function EnquiryForm() {
           </p>
 
           <form
-            className="consult-banner-form enquiry-banner-form"
+            className="consult-banner-form enquiry-banner-form ajax_form"
             onSubmit={handleSubmit}
             onBlur={handleFieldBlur}
           >

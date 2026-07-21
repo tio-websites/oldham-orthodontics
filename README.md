@@ -21,13 +21,15 @@ npm run lint       # ESLint check
 
 ## Architecture — Lead Capture
 
-Patient enquiries are captured by **PRM** (Patient Relationship Manager by TIO). PRM is a receiver — it does not host the forms. Each form on the site POSTs FormData directly to `prm.tio.work` using the **v4-tds web-form convention** (hidden `wf` field, account-level API key in the `TDS-API-KEY` header, honeypots, and optional file uploads). PRM then fires email templates, routes leads into the practice inbox, and feeds the dashboard.
+Patient enquiries are captured by **PRM** (Patient Relationship Manager by TIO). PRM is a receiver — it does not host the forms. Each form POSTs FormData to PRM using the **v4-tds web-form convention** (hidden `wf` field, honeypots, and optional file uploads). PRM then fires email templates, routes leads into the practice inbox, and feeds the dashboard.
+
+**Forms run in PROXIED mode** — they POST *same-origin* to this site's own `/api/prm/*` route handlers, which inject the `TDS-API-KEY` server-side and forward to `prm.tio.work`. The scoped TDS submission key is a **server-side Vercel env var (`TDS_API_KEY`)** and **never ships to the browser**. See `src/app/lib/prm-proxy-core.ts` and `src/app/api/prm/*/route.ts`.
 
 ## Forms & PRM Integration
 
-The site has four forms. All four post directly to PRM using the same shared submission helper.
+The site has four forms. All four post through the same-origin proxy via one shared submission helper.
 
-> **Status:** `wf` workflow IDs are wired into each form. The free-consultation page and the inline consultation banner share the same workflow. The `NEXT_PUBLIC_PRM_ACCOUNT_ID`, `NEXT_PUBLIC_TDS_API_KEY`, and `NEXT_PUBLIC_PRM_ENDPOINT` env vars must be set in Vercel before forms can submit.
+> **Status:** `wf` workflow IDs are wired into each form. The free-consultation page and the inline consultation banner share the same workflow. Proxied mode requires `TDS_API_KEY` (server-side), `NEXT_PUBLIC_PRM_PROXY_BASE=/api/prm`, and `NEXT_PUBLIC_PRM_ACCOUNT_ID` set in Vercel (see Environment Variables).
 
 | Form | Page | Component | Workflow ID (`wf`) |
 |------|------|-----------|--------------------|
@@ -48,14 +50,26 @@ src/app/lib/
 
 **`submitPrmForm(form: HTMLFormElement)`**
 - Serializes `<form>` to `application/x-www-form-urlencoded`
-- POSTs to `NEXT_PUBLIC_PRM_ENDPOINT` with `TDS-API-KEY` header
+- **Proxied mode** (default — `NEXT_PUBLIC_PRM_PROXY_BASE` set): POSTs same-origin to `/api/prm/xcms-to-prm-v4-tds` with **no key header** (the proxy adds it). **Direct mode** (fallback): POSTs to `NEXT_PUBLIC_PRM_ENDPOINT` with the `TDS-API-KEY` header.
 - Strips honeypot fields before sending; if a honeypot is filled it returns `{ success: true }` silently so bots get a fake-success
 - Returns `{ success, error? }` for the caller to redirect or show an error
 
 **`uploadFile(file: File)`** (used by Dentist Referral)
-- Uploads each image to `prm.tio.work/api/v2/upload-file` with `accountid` + the API key
+- Uploads each image to `/api/prm/v2/upload-file` (proxied) — or `prm.tio.work/api/v2/upload-file` in direct mode — with the `accountid`
 - Returns a hosted URL that the form then submits as a hidden `referral_photo_N` field
 - Enforces a 10MB-per-file cap
+
+### The PRM proxy (`/api/prm/*`)
+
+`src/app/lib/prm-proxy-core.ts` is an origin-gated forwarder used by three App Router route handlers:
+
+| Route | Forwards to | Used by |
+|---|---|---|
+| `src/app/api/prm/xcms-to-prm-v4-tds/route.ts` | `prm.tio.work/api/xcms-to-prm-v4-tds` | all lead forms |
+| `src/app/api/prm/v2/upload-file/route.ts` | `prm.tio.work/api/v2/upload-file` | referral photo uploads |
+| `src/app/api/prm/html-to-pdf/generate/route.ts` | `prm.tio.work/api/html-to-pdf/generate` | (parity — no PDF forms yet) |
+
+Each handler injects `TDS_API_KEY` (server-side) and passes PRM's status + body back verbatim, so the client behaves identically to a direct PRM call — just without ever seeing the key.
 
 ### Per-form hidden fields
 
@@ -74,7 +88,7 @@ Each form includes a standard PRM payload (mirrors TBP's pattern):
 <input type="hidden" name="local_part[0]" value={EMAIL_LOCAL_PART} />
 <input type="hidden" name="domain[0]" value={EMAIL_DOMAIN} />
 
-{/* UTM attribution — populated by tracking script on the page */}
+{/* UTM attribution — populated by /js/prm-attribution.js on form.ajax_form submit */}
 <input type="hidden" name="custom14" defaultValue="" id="fPages" />
 <input type="hidden" name="custom15" defaultValue="" id="fContent" />
 <input type="hidden" name="custom16" defaultValue="" id="fSource" />
@@ -113,28 +127,57 @@ All forms include:
 - UTM attribution passed through hidden `custom14`–`custom20` fields (page, content, source, medium, term, campaign, Google client ID)
 - File uploads sized at ≤10MB and gated behind PRM's upload endpoint
 
+## Analytics & Tracking
+
+Consent-gated in `src/app/components/Analytics.tsx` — **nothing fires until the visitor accepts cookies** (`CookieConsent.tsx` sets `window.__OLDHAM_CONSENT__` and dispatches an `oldham-consent` event). On accept, it loads:
+
+| Tag | ID | Notes |
+|---|---|---|
+| Google Tag Manager | `GTM-TRC7LX45` | container |
+| GA4 (gtag) | `G-9JGC66CELX` | direct config, fires alongside GTM |
+| Meta Pixel | _(none)_ | only if `NEXT_PUBLIC_META_PIXEL_ID` is set |
+
+Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loaders point at the same-origin `/v2ur` path, which `vercel.json` rewrites to `gtm-trc7lx45.fps.goog` (+ `Host` and `X-Gtg-Developer-Id: dMjAzY2` headers). This dodges Safari/ITP third-party blocking (~11% better signal per Google). Mode A (`trailingSlash:false`): GTM loader → `/v2ur?id=`, gtag loader → `/v2ur/`.
+
+> ⚠️ **Double-count caveat:** GA4 fires both directly (gtag) and could fire again if the GTM container `GTM-TRC7LX45` *also* contains a GA4 tag for `G-9JGC66CELX`. Confirm the container has **no** GA4 tag for that ID, or remove one side.
+
+**GTG post-deploy validation** (all must pass):
+```bash
+curl -s  "https://oldhamorthodontics.co.uk/v2ur/healthy"    # → ok
+curl -s  "https://oldhamorthodontics.co.uk/v2ur/healthy/"   # → ok
+curl -sI "https://oldhamorthodontics.co.uk/v2ur/?id=GTM-TRC7LX45"  # → 200 JS, 0 redirects
+curl -sI "https://oldhamorthodontics.co.uk/v2ur/"           # → 200 JS (gtag)
+```
+The GTG origin (`gtm-trc7lx45.fps.goog`) is assumed to follow the standard `gtm-{container-lowercase}.fps.goog` pattern — the health check above confirms it. If it fails, get the real origin from Callum/Datahash.
+
+**Attribution:** `public/js/prm-attribution.js` (from the `prm-custom-attribution-code` skill, GA4 ID `G-9JGC66CELX`) captures UTM/gclid/dclid/referrer + GA4 client_id and writes them into `custom14`–`custom20` on `form.ajax_form` submit. All four PRM forms carry the `ajax_form` class so the script targets them.
+
 ## Environment Variables (Vercel)
 
-Set these on the Vercel project before forms will submit:
+Set these on the Vercel project (Production **and** Preview):
 
-| Variable | Purpose | Where to find it |
+| Variable | Purpose | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_PRM_ENDPOINT` | Full v4-tds endpoint URL (e.g. `https://prm.tio.work/api/xcms-to-prm-v4-tds`) | PRM admin → Account → API |
-| `NEXT_PUBLIC_TDS_API_KEY` | Account-level API key (sent as `TDS-API-KEY` header) | PRM admin → Account → API |
-| `NEXT_PUBLIC_PRM_ACCOUNT_ID` | Numeric PRM account ID (used for file uploads + the `accountid` hidden field) | PRM admin → Account |
+| `TDS_API_KEY` | Scoped TDS submission key, injected by the proxy | **Server-side only — never `NEXT_PUBLIC_`.** From PRM admin → Account → API |
+| `NEXT_PUBLIC_PRM_PROXY_BASE` | `/api/prm` — turns on proxied mode | Public, safe |
+| `NEXT_PUBLIC_PRM_ACCOUNT_ID` | Numeric PRM account ID (`accountid` field + uploads) | Public. PRM admin → Account |
 
-All three are `NEXT_PUBLIC_*` because they are read in client components. The API key is account-level (not user-level) and gated behind PRM's per-account access controls — the same model TBP and Pallant use.
+> 🔒 **Do NOT set `NEXT_PUBLIC_TDS_API_KEY`.** In proxied mode the key lives server-side in `TDS_API_KEY`; a `NEXT_PUBLIC_` copy would be inlined into the browser bundle and defeat the proxy. (Direct-mode fallback only: leave `NEXT_PUBLIC_PRM_PROXY_BASE` blank and set `NEXT_PUBLIC_PRM_ENDPOINT` + `NEXT_PUBLIC_TDS_API_KEY` instead.)
+
+GA4/GTM IDs are hardcoded as safe defaults in `Analytics.tsx`; override via optional `NEXT_PUBLIC_GA4_ID` / `NEXT_PUBLIC_GTM_ID` only if the property changes. See `.env.example`.
 
 ## What's still needed before go-live
 
-Workflow IDs are wired into the components. To make the forms actually submit:
+1. **Vercel env vars** (Production + Preview): set `TDS_API_KEY` (server-side), `NEXT_PUBLIC_PRM_PROXY_BASE=/api/prm`, `NEXT_PUBLIC_PRM_ACCOUNT_ID`. **Remove `NEXT_PUBLIC_TDS_API_KEY`** so the key can't be inlined into the bundle.
+2. **Confirm the GDPR recipient** — currently `info@oldhamorthodontics.co.uk` (`local_part[0]` + `domain[0]` in each form). Update those constants if it should be a different inbox.
+3. **Verify each workflow's action set is configured in PRM** — email templates, notification recipients, GDPR copy address. The Dentist Referral wf requires `dentist_form=1` (already submitted) for the GDPR email template.
+4. **Confirm GTM `GTM-TRC7LX45` has no GA4 tag for `G-9JGC66CELX`** (GA4 also fires directly) — else double-count.
+5. **End-to-end test on Vercel** (not localhost — PRM CORS/security alerts key off the real domain): submit each form, confirm POST hits `/api/prm/*` with **no `TDS-API-KEY` header**, leads land in PRM + emails arrive, and the referral file upload works.
+6. **Validate GTG** post-deploy — run the four curl checks in [Analytics & Tracking](#analytics--tracking); all must pass.
+7. **Add the Oldham domains to the Google Maps API allowlist** so the verified business pin renders.
+8. **DNS** pointed to Vercel.
 
-1. **Set the three env vars in Vercel** (Production + Preview): `NEXT_PUBLIC_PRM_ENDPOINT`, `NEXT_PUBLIC_TDS_API_KEY`, `NEXT_PUBLIC_PRM_ACCOUNT_ID`
-2. **Confirm the GDPR recipient** — currently `info@oldhamorthodontics.co.uk` (set via `local_part[0]` + `domain[0]` in each form). If it should be a different inbox, update those constants in the four form components.
-3. **Verify each workflow's action set is configured in PRM** — email templates, notification recipients, GDPR copy address. The Dentist Referral wf requires the `dentist_form=1` flag (already submitted) for the GDPR email template to dispatch.
-4. **End-to-end test** — submit each form on the Vercel preview, confirm leads land in PRM dashboard + notification emails arrive.
-
-Thank-you pages live at `/contact-thank-you`, `/consultation-thank-you`, `/referral-thank-you` and are marked `robots: noindex` so they don't pollute search.
+Thank-you pages live at `/contact-thank-you`, `/consultation-thank-you`, `/referral-thank-you` and are marked `robots: noindex`.
 
 ## Deployment
 
@@ -152,30 +195,39 @@ git config user.email  # should be "syed@growdental.com"
 ## Project Structure
 
 ```
+vercel.json                         # GTG /v2ur rewrites → gtm-trc7lx45.fps.goog
+.env.example                        # env var reference (proxied mode + analytics)
 src/app/
   page.tsx                          # Homepage
-  layout.tsx                        # Root layout (header, footer, fonts)
+  layout.tsx                        # Root layout (header, footer, GTM noscript, Analytics, attribution)
   globals.css                       # Global styles
   inner-page.css                    # Inner page shared styles
   contact/
-    page.tsx, EnquiryForm.tsx       # Contact form
+    page.tsx, EnquiryForm.tsx       # Contact form (.ajax_form)
   free-consultation/
-    page.tsx, booking.css           # Booking form (inline)
+    page.tsx, booking.css           # Booking form (.ajax_form)
   dentist-referrals/
-    page.tsx, ReferralForm.tsx      # Dentist referral form
+    page.tsx, ReferralForm.tsx      # Dentist referral form (.ajax_form) + photo upload
+  api/prm/                          # Same-origin PRM proxy (route handlers)
+    xcms-to-prm-v4-tds/route.ts
+    v2/upload-file/route.ts
+    html-to-pdf/generate/route.ts
   components/
-    SiteHeader.tsx, SiteFooter.tsx
-    VisitSection.tsx, SectionDivider.tsx, BeforeAfterSlider.tsx
+    SiteHeader.tsx, SiteFooter.tsx, VisitSection.tsx, ...
+    CookieConsent.tsx               # Consent banner (gates analytics)
+    Analytics.tsx                   # Consent-gated GTM + GA4 + Meta Pixel via GTG
     inner/
-      ConsultBannerForm.tsx         # Reusable inline consultation banner
+      ConsultBannerForm.tsx         # Reusable inline consultation banner (.ajax_form)
   lib/
-    internal-links.ts
-    render-policy.tsx
-    formSubmit.ts                   # (to be added) Shared PRM submit helper
-    validators.ts                   # (to be added) Form field validators
-  about-us/, treatments/, results/, costs/, dentist-referrals/, ...
+    formSubmit.ts                   # Shared PRM submit helper (proxied/direct)
+    prm-proxy-core.ts               # Origin-gated proxy forwarder (server-side)
+    validators.ts                   # Form field validators
+    internal-links.ts, render-policy.tsx
+  about-us/, treatments/, results/, costs/, ...
+  sitemap.ts, robots.ts, manifest.ts
 public/
-  images/, favicons/, logos/
+  js/prm-attribution.js             # PRM/GA4 attribution (feeds custom14–custom20)
+  images/, favicon.ico, apple-icon.png
 ```
 
 ## Status
@@ -190,6 +242,12 @@ public/
 - [x] **Forms wired to PRM** (`submitPrmForm` + per-field validation)
 - [x] **Honeypots + UTM hidden fields added to each form**
 - [x] **Thank-you pages live** (`/contact-thank-you`, `/consultation-thank-you`, `/referral-thank-you`)
-- [ ] **Vercel env vars set** (`NEXT_PUBLIC_PRM_ENDPOINT`, `NEXT_PUBLIC_TDS_API_KEY`, `NEXT_PUBLIC_PRM_ACCOUNT_ID`)
-- [ ] **End-to-end test** — submit each form on the deployed preview, verify lead lands in PRM dashboard + notification email arrives
+- [x] **PRM proxy (proxied mode)** — forms POST same-origin to `/api/prm/*`; TDS key server-side only
+- [x] **Analytics** — consent-gated GTM (`GTM-TRC7LX45`) + GA4 (`G-9JGC66CELX`), first-party via GTG
+- [x] **PRM/GA4 attribution** — `/js/prm-attribution.js` feeding `custom14`–`custom20`
+- [x] **Dynamic sitemap + robots** audited (all indexable routes, thank-you/template excluded)
+- [ ] **Vercel env vars set** (`TDS_API_KEY`, `NEXT_PUBLIC_PRM_PROXY_BASE`, `NEXT_PUBLIC_PRM_ACCOUNT_ID`; remove `NEXT_PUBLIC_TDS_API_KEY`)
+- [ ] **End-to-end form test on Vercel** — lead in PRM + email + referral upload
+- [ ] **GTG validation** — four curl checks pass post-deploy
+- [ ] **Google Maps API allowlist** — add Oldham domains
 - [ ] DNS pointed to Vercel

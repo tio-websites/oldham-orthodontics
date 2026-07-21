@@ -101,7 +101,7 @@ export default function ConsultBannerForm({
           <span className="consult-banner-label">{label}</span>
           <h2>{title}</h2>
           <p>{description}</p>
-          <form className="consult-banner-form" onSubmit={handleSubmit} onBlur={handleFieldBlur}>
+          <form className="consult-banner-form ajax_form" onSubmit={handleSubmit} onBlur={handleFieldBlur}>
             <input
               type="text"
               name="firstname"

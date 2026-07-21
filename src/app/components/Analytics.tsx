@@ -2,11 +2,22 @@
 
 import { useEffect } from "react";
 
-// Consent-gated analytics. Fires GA4 (id from env) + Meta Pixel ONLY after the
+// Consent-gated analytics. Fires GTM + GA4 + (optional) Meta Pixel ONLY after the
 // visitor accepts cookies (CookieConsent sets window.__OLDHAM_CONSENT__ and
 // dispatches 'oldham-consent'). Nothing loads before consent.
-const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID; // FLAG: supplied by the practice
+//
+// GTM + GA4 are served FIRST-PARTY via Google Tag Gateway (GTG): the loaders point
+// at the same-origin /v2ur path, which vercel.json rewrites to gtm-trc7lx45.fps.goog.
+// This dodges Safari/ITP third-party blocking (~11% better signal per Google).
+//   - GTM loader  → /v2ur?id=GTM-…   (Mode A / trailingSlash:false form)
+//   - gtag loader → /v2ur/            (Google's gtag endpoint; needs the trailing slash)
+const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID || "G-9JGC66CELX";
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-TRC7LX45";
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID; // FLAG: none on the current live site
+
+// First-party GTG measurement path (rewritten in vercel.json).
+const GTG_GTM_SRC = "/v2ur?id=";
+const GTG_GTAG_SRC = "/v2ur/";
 
 declare global {
   interface Window {
@@ -25,13 +36,23 @@ export default function Analytics() {
       if (loaded || window.__OLDHAM_CONSENT__ !== "accepted") return;
       loaded = true;
 
-      // GA4
+      window.dataLayer = window.dataLayer || [];
+
+      // Google Tag Manager (first-party via GTG)
+      if (GTM_ID) {
+        window.dataLayer.push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        const g = document.createElement("script");
+        g.async = true;
+        g.src = GTG_GTM_SRC + GTM_ID;
+        document.head.appendChild(g);
+      }
+
+      // GA4 direct gtag config (first-party via GTG)
       if (GA4_ID) {
         const s = document.createElement("script");
         s.async = true;
-        s.src = `https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`;
+        s.src = GTG_GTAG_SRC;
         document.head.appendChild(s);
-        window.dataLayer = window.dataLayer || [];
         window.gtag = function gtag() { window.dataLayer!.push(arguments); };
         window.gtag("js", new Date());
         window.gtag("config", GA4_ID);
