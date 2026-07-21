@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { posts } from "./about-us/blog/posts";
 
-const BASE_URL = "https://oldhamorthodontics.co.uk";
+const BASE_URL = "https://www.oldhamorthodontics.co.uk";
 
 const staticRoutes: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
   { path: "/", changeFrequency: "monthly", priority: 1.0 },

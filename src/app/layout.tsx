@@ -15,7 +15,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://oldhamorthodontics.co.uk"),
+  metadataBase: new URL("https://www.oldhamorthodontics.co.uk"),
   title: {
     default: "Oldham Orthodontics | Specialist Orthodontic Care in Oldham",
     template: "%s | Oldham Orthodontics",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "Oldham Orthodontics",
     title: "Oldham Orthodontics | Specialist Orthodontic Care in Oldham",
     description: "Modern braces and advanced aligner treatments delivered by experienced, trusted orthodontists in a warm and welcoming practice in Oldham.",
-    url: "https://oldhamorthodontics.co.uk",
+    url: "https://www.oldhamorthodontics.co.uk",
     images: [
       {
         url: "/images/about-us-hero.webp",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     images: ["/images/about-us-hero.webp"],
   },
   alternates: {
-    canonical: "https://oldhamorthodontics.co.uk",
+    canonical: "https://www.oldhamorthodontics.co.uk",
   },
   robots: {
     index: true,
@@ -67,9 +67,9 @@ const practiceSchema = {
   "@context": "https://schema.org",
   "@type": "Dentist",
   name: "Oldham Orthodontics",
-  url: "https://oldhamorthodontics.co.uk",
-  logo: "https://oldhamorthodontics.co.uk/images/oldham-logo.png",
-  image: "https://oldhamorthodontics.co.uk/images/about-us-hero.webp",
+  url: "https://www.oldhamorthodontics.co.uk",
+  logo: "https://www.oldhamorthodontics.co.uk/images/oldham-logo.png",
+  image: "https://www.oldhamorthodontics.co.uk/images/about-us-hero.webp",
   telephone: "+44 161 622 0987",
   email: "info@oldhamorthodontics.co.uk",
   medicalSpecialty: "Orthodontic",
@@ -101,8 +101,8 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Oldham Orthodontics",
-  url: "https://oldhamorthodontics.co.uk",
-  logo: "https://oldhamorthodontics.co.uk/images/oldham-logo.png",
+  url: "https://www.oldhamorthodontics.co.uk",
+  logo: "https://www.oldhamorthodontics.co.uk/images/oldham-logo.png",
   sameAs: [
     "https://www.facebook.com/OldhamOrthodontics",
     "https://www.youtube.com/channel/UC6v5MtYOziWoEu9ZU6TH9gA",

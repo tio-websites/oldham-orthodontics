@@ -143,10 +143,10 @@ Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loade
 
 **GTG post-deploy validation** (all must pass):
 ```bash
-curl -s  "https://oldhamorthodontics.co.uk/v2ur/healthy"    # → ok
-curl -s  "https://oldhamorthodontics.co.uk/v2ur/healthy/"   # → ok
-curl -sI "https://oldhamorthodontics.co.uk/v2ur/?id=GTM-TRC7LX45"  # → 200 JS, 0 redirects
-curl -sI "https://oldhamorthodontics.co.uk/v2ur/"           # → 200 JS (gtag)
+curl -s  "https://www.oldhamorthodontics.co.uk/v2ur/healthy"    # → ok
+curl -s  "https://www.oldhamorthodontics.co.uk/v2ur/healthy/"   # → ok
+curl -sI "https://www.oldhamorthodontics.co.uk/v2ur/?id=GTM-TRC7LX45"  # → 200 JS, 0 redirects
+curl -sI "https://www.oldhamorthodontics.co.uk/v2ur/"           # → 200 JS (gtag)
 ```
 The GTG origin (`gtm-trc7lx45.fps.goog`) is assumed to follow the standard `gtm-{container-lowercase}.fps.goog` pattern — the health check above confirms it. If it fails, get the real origin from Callum/Datahash.
 
