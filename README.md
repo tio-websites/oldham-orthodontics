@@ -175,7 +175,7 @@ GA4/GTM IDs are hardcoded as safe defaults in `Analytics.tsx`; override via opti
 5. **End-to-end test on Vercel** (not localhost — PRM CORS/security alerts key off the real domain): submit each form, confirm POST hits `/api/prm/*` with **no `TDS-API-KEY` header**, leads land in PRM + emails arrive, and the referral file upload works.
 6. **Validate GTG** post-deploy — run the four curl checks in [Analytics & Tracking](#analytics--tracking); all must pass.
 7. **Add the Oldham domains to the Google Maps API allowlist** so the verified business pin renders.
-8. **DNS** pointed to Vercel.
+8. **DNS + www redirect** — point DNS to Vercel and set **`www.oldhamorthodontics.co.uk` as the primary domain with an apex → www 308 redirect**. The site is canonical on www (metadata, sitemap, robots, schema all use www), so the bare apex must redirect to it.
 
 Thank-you pages live at `/contact-thank-you`, `/consultation-thank-you`, `/referral-thank-you` and are marked `robots: noindex`.
 
@@ -246,8 +246,9 @@ public/
 - [x] **Analytics** — consent-gated GTM (`GTM-TRC7LX45`) + GA4 (`G-9JGC66CELX`), first-party via GTG
 - [x] **PRM/GA4 attribution** — `/js/prm-attribution.js` feeding `custom14`–`custom20`
 - [x] **Dynamic sitemap + robots** audited (all indexable routes, thank-you/template excluded)
+- [x] **Canonical domain = www** (metadata, sitemap, robots, schema all use `https://www.oldhamorthodontics.co.uk`)
 - [ ] **Vercel env vars set** (`TDS_API_KEY`, `NEXT_PUBLIC_PRM_PROXY_BASE`, `NEXT_PUBLIC_PRM_ACCOUNT_ID`; remove `NEXT_PUBLIC_TDS_API_KEY`)
 - [ ] **End-to-end form test on Vercel** — lead in PRM + email + referral upload
 - [ ] **GTG validation** — four curl checks pass post-deploy
 - [ ] **Google Maps API allowlist** — add Oldham domains
-- [ ] DNS pointed to Vercel
+- [ ] DNS pointed to Vercel + apex → www redirect (www is primary)
