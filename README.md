@@ -134,12 +134,12 @@ Consent-gated in `src/app/components/Analytics.tsx` — **nothing fires until th
 | Tag | ID | Notes |
 |---|---|---|
 | Google Tag Manager | `GTM-TRC7LX45` | container |
-| GA4 (gtag) | `G-FGG9MW14XY` (client-supplied) + `G-9JGC66CELX` (from old live site) | direct config, fires alongside GTM — **confirm which is canonical, drop the other** |
+| GA4 (gtag) | `G-FGG9MW14XY` | direct config, fires alongside GTM |
 | Meta Pixel | _(none)_ | only if `NEXT_PUBLIC_META_PIXEL_ID` is set |
 
 Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loaders point at the same-origin `/v2ur` path, which `vercel.json` rewrites to `gtm-trc7lx45.fps.goog` (+ `Host` and `X-Gtg-Developer-Id: dMjAzY2` headers). This dodges Safari/ITP third-party blocking (~11% better signal per Google). Mode A (`trailingSlash:false`): GTM loader → `/v2ur?id=`, gtag loader → `/v2ur/`.
 
-> ⚠️ **Double-count caveat:** GA4 fires both directly (gtag) and could fire again if the GTM container `GTM-TRC7LX45` *also* contains a GA4 tag for `G-9JGC66CELX`. Confirm the container has **no** GA4 tag for that ID, or remove one side.
+> ⚠️ **Double-count caveat:** GA4 fires both directly (gtag) and could fire again if the GTM container `GTM-TRC7LX45` *also* contains a GA4 tag for `G-FGG9MW14XY`. Confirm the container has **no** GA4 tag for that ID, or remove one side.
 
 **GTG post-deploy validation** (all must pass):
 ```bash
@@ -150,7 +150,7 @@ curl -sI "https://www.oldhamorthodontics.co.uk/v2ur/"           # → 200 JS (gt
 ```
 The GTG origin (`gtm-trc7lx45.fps.goog`) is assumed to follow the standard `gtm-{container-lowercase}.fps.goog` pattern — the health check above confirms it. If it fails, get the real origin from Callum/Datahash.
 
-**Attribution:** `public/js/prm-attribution.js` (from the `prm-custom-attribution-code` skill, GA4 ID `G-9JGC66CELX`) captures UTM/gclid/dclid/referrer + GA4 client_id and writes them into `custom14`–`custom20` on `form.ajax_form` submit. All four PRM forms carry the `ajax_form` class so the script targets them.
+**Attribution:** `public/js/prm-attribution.js` (from the `prm-custom-attribution-code` skill, GA4 ID `G-FGG9MW14XY`) captures UTM/gclid/dclid/referrer + GA4 client_id and writes them into `custom14`–`custom20` on `form.ajax_form` submit. All four PRM forms carry the `ajax_form` class so the script targets them.
 
 ## Environment Variables (Vercel)
 
@@ -171,7 +171,7 @@ GA4/GTM IDs are hardcoded as safe defaults in `Analytics.tsx`; override via opti
 1. **Vercel env vars** (Production + Preview): set `TDS_API_KEY` (server-side), `NEXT_PUBLIC_PRM_PROXY_BASE=/api/prm`, `NEXT_PUBLIC_PRM_ACCOUNT_ID`. **Remove `NEXT_PUBLIC_TDS_API_KEY`** so the key can't be inlined into the bundle.
 2. **Confirm the GDPR recipient** — currently `info@oldhamorthodontics.co.uk` (`local_part[0]` + `domain[0]` in each form). Update those constants if it should be a different inbox.
 3. **Verify each workflow's action set is configured in PRM** — email templates, notification recipients, GDPR copy address. The Dentist Referral wf requires `dentist_form=1` (already submitted) for the GDPR email template.
-4. **Confirm GTM `GTM-TRC7LX45` has no GA4 tag for `G-9JGC66CELX`** (GA4 also fires directly) — else double-count.
+4. **Confirm GTM `GTM-TRC7LX45` has no GA4 tag for `G-FGG9MW14XY`** (GA4 also fires directly) — else double-count.
 5. **End-to-end test on Vercel** (not localhost — PRM CORS/security alerts key off the real domain): submit each form, confirm POST hits `/api/prm/*` with **no `TDS-API-KEY` header**, leads land in PRM + emails arrive, and the referral file upload works.
 6. **Validate GTG** post-deploy — run the four curl checks in [Analytics & Tracking](#analytics--tracking); all must pass.
 7. **Add the Oldham domains to the Google Maps API allowlist** so the verified business pin renders.
@@ -243,7 +243,7 @@ public/
 - [x] **Honeypots + UTM hidden fields added to each form**
 - [x] **Thank-you pages live** (`/contact-thank-you`, `/consultation-thank-you`, `/referral-thank-you`)
 - [x] **PRM proxy (proxied mode)** — forms POST same-origin to `/api/prm/*`; TDS key server-side only
-- [x] **Analytics** — consent-gated GTM (`GTM-TRC7LX45`) + GA4 (`G-9JGC66CELX`), first-party via GTG
+- [x] **Analytics** — consent-gated GTM (`GTM-TRC7LX45`) + GA4 (`G-FGG9MW14XY`), first-party via GTG
 - [x] **PRM/GA4 attribution** — `/js/prm-attribution.js` feeding `custom14`–`custom20`
 - [x] **Dynamic sitemap + robots** audited (all indexable routes, thank-you/template excluded)
 - [x] **Canonical domain = www** (metadata, sitemap, robots, schema all use `https://www.oldhamorthodontics.co.uk`)

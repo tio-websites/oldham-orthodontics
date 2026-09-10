@@ -11,10 +11,7 @@ import { useEffect } from "react";
 // This dodges Safari/ITP third-party blocking (~11% better signal per Google).
 //   - GTM loader  → /v2ur?id=GTM-…   (Mode A / trailingSlash:false form)
 //   - gtag loader → /v2ur/            (Google's gtag endpoint; needs the trailing slash)
-// Comma-separated list. G-FGG9MW14XY supplied by client (Sep 2026); G-9JGC66CELX was
-// crawled from the old live site. FLAG: confirm which is canonical and drop the other.
-const GA4_IDS = (process.env.NEXT_PUBLIC_GA4_ID || "G-FGG9MW14XY,G-9JGC66CELX")
-  .split(",").map((id) => id.trim()).filter(Boolean);
+const GA4_ID = process.env.NEXT_PUBLIC_GA4_ID || "G-FGG9MW14XY";
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || "GTM-TRC7LX45";
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID; // FLAG: none on the current live site
 
@@ -51,14 +48,14 @@ export default function Analytics() {
       }
 
       // GA4 direct gtag config (first-party via GTG)
-      if (GA4_IDS.length) {
+      if (GA4_ID) {
         const s = document.createElement("script");
         s.async = true;
         s.src = GTG_GTAG_SRC;
         document.head.appendChild(s);
         window.gtag = function gtag() { window.dataLayer!.push(arguments); };
         window.gtag("js", new Date());
-        for (const id of GA4_IDS) window.gtag("config", id);
+        window.gtag("config", GA4_ID);
       }
 
       // Meta Pixel
