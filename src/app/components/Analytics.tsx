@@ -22,6 +22,21 @@ const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID; // FLAG: none on th
 const GTG_GTM_SRC = "/v2ur?id=";
 const GTG_GTAG_SRC = "/v2ur/gtag/js?id=";
 
+// QA affordance for GA4 DebugView. Real visitors never send a debug flag, so
+// DebugView stays empty unless you opt this browser in:
+//   ?ga_debug=1  -> flag this browser's hits (sticky, survives navigation)
+//   ?ga_debug=0  -> stop flagging
+// Without it GA4's DebugView shows "Waiting for debug events" even though the
+// hits are being collected normally into the standard reports.
+function ga4DebugEnabled(): boolean {
+  try {
+    const q = new URLSearchParams(window.location.search).get("ga_debug");
+    if (q === "1") { localStorage.setItem("ga_debug", "1"); return true; }
+    if (q === "0") { localStorage.removeItem("ga_debug"); return false; }
+    return localStorage.getItem("ga_debug") === "1";
+  } catch { return false; }
+}
+
 declare global {
   interface Window {
     dataLayer?: unknown[];
@@ -58,7 +73,9 @@ export default function Analytics() {
         document.head.appendChild(s);
         window.gtag = function gtag() { window.dataLayer!.push(arguments); };
         window.gtag("js", new Date());
-        window.gtag("config", GA4_ID);
+        // debug_mode also flags GA4 event tags fired by GTM, since they share
+        // this same G-… tag instance.
+        window.gtag("config", GA4_ID, ga4DebugEnabled() ? { debug_mode: true } : {});
       }
 
       // Meta Pixel

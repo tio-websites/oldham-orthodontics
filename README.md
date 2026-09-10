@@ -141,6 +141,8 @@ Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loade
 
 > **Double-count checked (Sep 2026):** the `GTM-TRC7LX45` container holds **6 GA4 *event* tags and no GA4 config tag**, so it sends no `page_view`. Page views come solely from the direct gtag config here. Do not add a GA4 config tag to the container without removing the direct gtag, or page views will double.
 
+> **GA4 DebugView:** real hits carry no debug flag, so DebugView shows "Waiting for debug events" even when collection is healthy. Append `?ga_debug=1` to any page to flag this browser (sticky until `?ga_debug=0`). GTM's GA4 event tags inherit the flag because they share the same `G-…` tag instance.
+
 > **No GTM `<noscript>` iframe:** GTG does not serve `ns.html` (404), and it would fire pre-consent. Consent needs JS anyway.
 
 **GTG post-deploy validation** (all must pass):
