@@ -118,16 +118,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${montserrat.variable} antialiased`}>
-        {/* Google Tag Manager (noscript) — first-party via GTG. JS-disabled fallback. */}
-        <noscript>
-          <iframe
-            src="/v2ur/ns.html?id=GTM-TRC7LX45"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-            title="gtm"
-          />
-        </noscript>
+        {/* No GTM <noscript> iframe: Google Tag Gateway does not serve ns.html (404),
+            and a noscript iframe would fire before cookie consent anyway. Consent
+            itself needs JS, so a JS-disabled visitor is never measured regardless. */}
         <Script
           src="https://www.bugherd.com/sidebarv2.js?apikey=m0sczixxlaa9gfw9pygzya"
           strategy="afterInteractive"

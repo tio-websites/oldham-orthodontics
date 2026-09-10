@@ -137,16 +137,18 @@ Consent-gated in `src/app/components/Analytics.tsx` — **nothing fires until th
 | GA4 (gtag) | `G-FGG9MW14XY` | direct config, fires alongside GTM |
 | Meta Pixel | _(none)_ | only if `NEXT_PUBLIC_META_PIXEL_ID` is set |
 
-Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loaders point at the same-origin `/v2ur` path, which `vercel.json` rewrites to `gtm-trc7lx45.fps.goog` (+ `Host` and `X-Gtg-Developer-Id: dMjAzY2` headers). This dodges Safari/ITP third-party blocking (~11% better signal per Google). Mode A (`trailingSlash:false`): GTM loader → `/v2ur?id=`, gtag loader → `/v2ur/`.
+Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loaders point at the same-origin `/v2ur` path, which `vercel.json` rewrites to `gtm-trc7lx45.fps.goog` (+ `Host` and `X-Gtg-Developer-Id: dMjAzY2` headers). This dodges Safari/ITP third-party blocking (~11% better signal per Google). Mode A (`trailingSlash:false`): GTM loader → `/v2ur?id=`, gtag loader → `/v2ur/gtag/js?id=`. A bare `/v2ur/` 308-redirects under `trailingSlash:false` and carries no `?id=`, so it must not be used for gtag.
 
-> ⚠️ **Double-count caveat:** GA4 fires both directly (gtag) and could fire again if the GTM container `GTM-TRC7LX45` *also* contains a GA4 tag for `G-FGG9MW14XY`. Confirm the container has **no** GA4 tag for that ID, or remove one side.
+> **Double-count checked (Sep 2026):** the `GTM-TRC7LX45` container holds **6 GA4 *event* tags and no GA4 config tag**, so it sends no `page_view`. Page views come solely from the direct gtag config here. Do not add a GA4 config tag to the container without removing the direct gtag, or page views will double.
+
+> **No GTM `<noscript>` iframe:** GTG does not serve `ns.html` (404), and it would fire pre-consent. Consent needs JS anyway.
 
 **GTG post-deploy validation** (all must pass):
 ```bash
 curl -s  "https://www.oldhamorthodontics.co.uk/v2ur/healthy"    # → ok
 curl -s  "https://www.oldhamorthodontics.co.uk/v2ur/healthy/"   # → ok
 curl -sI "https://www.oldhamorthodontics.co.uk/v2ur/?id=GTM-TRC7LX45"  # → 200 JS, 0 redirects
-curl -sI "https://www.oldhamorthodontics.co.uk/v2ur/"           # → 200 JS (gtag)
+curl -sI "https://www.oldhamorthodontics.co.uk/v2ur/gtag/js?id=G-FGG9MW14XY"  # → 200 JS (gtag)
 ```
 The GTG origin (`gtm-trc7lx45.fps.goog`) is assumed to follow the standard `gtm-{container-lowercase}.fps.goog` pattern — the health check above confirms it. If it fails, get the real origin from Callum/Datahash.
 
@@ -171,7 +173,7 @@ GA4/GTM IDs are hardcoded as safe defaults in `Analytics.tsx`; override via opti
 1. **Vercel env vars** (Production + Preview): set `TDS_API_KEY` (server-side), `NEXT_PUBLIC_PRM_PROXY_BASE=/api/prm`, `NEXT_PUBLIC_PRM_ACCOUNT_ID`. **Remove `NEXT_PUBLIC_TDS_API_KEY`** so the key can't be inlined into the bundle.
 2. **Confirm the GDPR recipient** — currently `info@oldhamorthodontics.co.uk` (`local_part[0]` + `domain[0]` in each form). Update those constants if it should be a different inbox.
 3. **Verify each workflow's action set is configured in PRM** — email templates, notification recipients, GDPR copy address. The Dentist Referral wf requires `dentist_form=1` (already submitted) for the GDPR email template.
-4. **Confirm GTM `GTM-TRC7LX45` has no GA4 tag for `G-FGG9MW14XY`** (GA4 also fires directly) — else double-count.
+4. ~~Confirm GTM has no GA4 tag~~ — done Sep 2026: container has GA4 *event* tags only, no config tag. No double-count.
 5. **End-to-end test on Vercel** (not localhost — PRM CORS/security alerts key off the real domain): submit each form, confirm POST hits `/api/prm/*` with **no `TDS-API-KEY` header**, leads land in PRM + emails arrive, and the referral file upload works.
 6. **Validate GTG** post-deploy — run the four curl checks in [Analytics & Tracking](#analytics--tracking); all must pass.
 7. **Add the Oldham domains to the Google Maps API allowlist** so the verified business pin renders.
