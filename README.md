@@ -134,7 +134,7 @@ Consent-gated in `src/app/components/Analytics.tsx` — **nothing fires until th
 | Tag | ID | Notes |
 |---|---|---|
 | Google Tag Manager | `GTM-TRC7LX45` | container |
-| GA4 (gtag) | `G-9JGC66CELX` | direct config, fires alongside GTM |
+| GA4 (gtag) | `G-FGG9MW14XY` (client-supplied) + `G-9JGC66CELX` (from old live site) | direct config, fires alongside GTM — **confirm which is canonical, drop the other** |
 | Meta Pixel | _(none)_ | only if `NEXT_PUBLIC_META_PIXEL_ID` is set |
 
 Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loaders point at the same-origin `/v2ur` path, which `vercel.json` rewrites to `gtm-trc7lx45.fps.goog` (+ `Host` and `X-Gtg-Developer-Id: dMjAzY2` headers). This dodges Safari/ITP third-party blocking (~11% better signal per Google). Mode A (`trailingSlash:false`): GTM loader → `/v2ur?id=`, gtag loader → `/v2ur/`.
