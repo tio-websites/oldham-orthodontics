@@ -22,12 +22,15 @@ const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID; // FLAG: none on th
 const GTG_GTM_SRC = "/v2ur?id=";
 const GTG_GTAG_SRC = "/v2ur/gtag/js?id=";
 
-// QA affordance for GA4 DebugView. Real visitors never send a debug flag, so
-// DebugView stays empty unless you opt this browser in:
-//   ?ga_debug=1  -> flag this browser's hits (sticky, survives navigation)
-//   ?ga_debug=0  -> stop flagging
-// Without it GA4's DebugView shows "Waiting for debug events" even though the
-// hits are being collected normally into the standard reports.
+// QA affordance: ?ga_debug=1 marks this browser's hits with GA4's debug_mode
+// parameter (sticky; ?ga_debug=0 clears it). Useful for picking your own test
+// traffic out of Realtime and the standard reports.
+//
+// It does NOT make GA4's DebugView work. Verified 2026-09-11: gtag emits this
+// as an event parameter (ep.debug_mode=true), while DebugView only honours the
+// separate _dbg=1 flag, and hits carrying _dbg=1 through the Tag Gateway
+// (/v2ur) did not surface either. For live tag debugging use GTM Preview mode
+// or the Realtime report, both of which work correctly on this site.
 function ga4DebugEnabled(): boolean {
   try {
     const q = new URLSearchParams(window.location.search).get("ga_debug");

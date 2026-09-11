@@ -141,7 +141,7 @@ Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loade
 
 > **Double-count checked (Sep 2026):** the `GTM-TRC7LX45` container holds **6 GA4 *event* tags and no GA4 config tag**, so it sends no `page_view`. Page views come solely from the direct gtag config here. Do not add a GA4 config tag to the container without removing the direct gtag, or page views will double.
 
-> **GA4 DebugView:** real hits carry no debug flag, so DebugView shows "Waiting for debug events" even when collection is healthy. Append `?ga_debug=1` to any page to flag this browser (sticky until `?ga_debug=0`). GTM's GA4 event tags inherit the flag because they share the same `G-…` tag instance.
+> **Debugging tags — use Realtime or GTM Preview, not DebugView.** Verified 2026-09-11: GA4's DebugView only honours the `_dbg=1` flag, which gtag does not emit here (it sends `ep.debug_mode=true`), and hits carrying `_dbg=1` through the Tag Gateway did not surface either. The Realtime report works correctly and shows `page_view`, `session_start` and `click_to_call` as they happen. `?ga_debug=1` still marks this browser's hits with a `debug_mode` parameter (clear with `?ga_debug=0`), which is handy for spotting your own test traffic.
 
 > **No GTM `<noscript>` iframe:** GTG does not serve `ns.html` (404), and it would fire pre-consent. Consent needs JS anyway.
 
