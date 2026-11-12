@@ -7,6 +7,7 @@ import SiteFooter from "./components/SiteFooter";
 import VisitSection from "./components/VisitSection";
 import CookieConsent from "./components/CookieConsent";
 import Analytics from "./components/Analytics";
+import { consentModeDefault } from "./lib/consent";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -117,10 +118,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Consent Mode v2 default — MUST be the first script, before GTM / gtag.js
+            load (Analytics.tsx). Analytics granted unless the visitor turned it off;
+            advertising denied until Accept. See src/app/lib/consent.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: consentModeDefault }} />
+      </head>
       <body className={`${montserrat.variable} antialiased`}>
         {/* No GTM <noscript> iframe: Google Tag Gateway does not serve ns.html (404),
-            and a noscript iframe would fire before cookie consent anyway. Consent
-            itself needs JS, so a JS-disabled visitor is never measured regardless. */}
+            so a JS-disabled visitor is not measured. */}
         <Script
           src="https://www.bugherd.com/sidebarv2.js?apikey=m0sczixxlaa9gfw9pygzya"
           strategy="afterInteractive"

@@ -2,9 +2,18 @@
 
 import { useEffect } from "react";
 
-// Consent-gated analytics. Fires GTM + GA4 + (optional) Meta Pixel ONLY after the
-// visitor accepts cookies (CookieConsent sets window.__OLDHAM_CONSENT__ and
-// dispatches 'oldham-consent'). Nothing loads before consent.
+// Analytics + advertising tags, per the fleet consent standard ("Dr Dev setup",
+// Lora + Callum, 11 Nov 2026):
+//   - GTM + GA4 load on EVERY page for EVERY visitor, not behind the banner. The
+//     Consent Mode v2 default (src/app/lib/consent.ts, first script in <head>)
+//     already grants analytics_storage (denied only for "Turn off analytics
+//     cookies") and denies ad_storage / ad_user_data / ad_personalization until
+//     Accept, so GA4 measures with analytics cookies only.
+//   - GA4 is configured HERE only (the GTM container has GA4 event tags but no
+//     Google tag / config tag), with Google signals and ad-personalisation off.
+//   - The Meta Pixel (if NEXT_PUBLIC_META_PIXEL_ID is ever set) stays consent-gated:
+//     it loads only once the visitor accepts (CookieConsent sets
+//     window.__OLDHAM_CONSENT__ and dispatches 'oldham-consent').
 //
 // GTM + GA4 are served FIRST-PARTY via Google Tag Gateway (GTG): the loaders point
 // at the same-origin /v2ur path, which vercel.json rewrites to gtm-trc7lx45.fps.goog.
@@ -50,36 +59,48 @@ declare global {
 }
 
 export default function Analytics() {
+  // GTM + GA4: every visitor, every page (consent default is already set in <head>).
+  useEffect(() => {
+    window.dataLayer = window.dataLayer || [];
+    if (!window.gtag) {
+      // gtag must push the `arguments` object itself, not a rest-parameter array.
+      // eslint-disable-next-line prefer-rest-params
+      window.gtag = function gtag() { window.dataLayer!.push(arguments); };
+    }
+
+    // Google Tag Manager (first-party via GTG)
+    if (GTM_ID && !document.querySelector(`script[src="${GTG_GTM_SRC + GTM_ID}"]`)) {
+      window.dataLayer.push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+      const g = document.createElement("script");
+      g.async = true;
+      g.src = GTG_GTM_SRC + GTM_ID;
+      document.head.appendChild(g);
+    }
+
+    // GA4 direct gtag config (first-party via GTG) — the ONLY place GA4 is configured.
+    if (GA4_ID && !document.querySelector(`script[src="${GTG_GTAG_SRC + GA4_ID}"]`)) {
+      const s = document.createElement("script");
+      s.async = true;
+      s.src = GTG_GTAG_SRC + GA4_ID;
+      document.head.appendChild(s);
+      window.gtag("js", new Date());
+      // debug_mode also flags GA4 event tags fired by GTM, since they share
+      // this same G-… tag instance.
+      window.gtag("config", GA4_ID, {
+        allow_google_signals: false,
+        allow_ad_personalization_signals: false,
+        ...(ga4DebugEnabled() ? { debug_mode: true } : {}),
+      });
+    }
+  }, []);
+
+  // Advertising tags: consent-gated, load only after "Accept all".
   useEffect(() => {
     let loaded = false;
 
-    function load() {
+    function loadAds() {
       if (loaded || window.__OLDHAM_CONSENT__ !== "accepted") return;
       loaded = true;
-
-      window.dataLayer = window.dataLayer || [];
-
-      // Google Tag Manager (first-party via GTG)
-      if (GTM_ID) {
-        window.dataLayer.push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        const g = document.createElement("script");
-        g.async = true;
-        g.src = GTG_GTM_SRC + GTM_ID;
-        document.head.appendChild(g);
-      }
-
-      // GA4 direct gtag config (first-party via GTG)
-      if (GA4_ID) {
-        const s = document.createElement("script");
-        s.async = true;
-        s.src = GTG_GTAG_SRC + GA4_ID;
-        document.head.appendChild(s);
-        window.gtag = function gtag() { window.dataLayer!.push(arguments); };
-        window.gtag("js", new Date());
-        // debug_mode also flags GA4 event tags fired by GTM, since they share
-        // this same G-… tag instance.
-        window.gtag("config", GA4_ID, ga4DebugEnabled() ? { debug_mode: true } : {});
-      }
 
       // Meta Pixel
       if (META_PIXEL_ID) {
@@ -95,8 +116,8 @@ export default function Analytics() {
       }
     }
 
-    if (window.__OLDHAM_CONSENT__ === "accepted") load();
-    const handler = (e: Event) => { if ((e as CustomEvent).detail === "accepted") load(); };
+    if (window.__OLDHAM_CONSENT__ === "accepted") loadAds();
+    const handler = (e: Event) => { if ((e as CustomEvent).detail === "accepted") loadAds(); };
     window.addEventListener("oldham-consent", handler);
     return () => window.removeEventListener("oldham-consent", handler);
   }, []);
