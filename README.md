@@ -129,13 +129,19 @@ All forms include:
 
 ## Analytics & Tracking
 
-Consent-gated in `src/app/components/Analytics.tsx` — **nothing fires until the visitor accepts cookies** (`CookieConsent.tsx` sets `window.__OLDHAM_CONSENT__` and dispatches an `oldham-consent` event). On accept, it loads:
+Follows the TIO fleet consent standard ("Dr Dev setup", Lora + Callum, 11 Nov 2026): **GA4 fires for every visitor on page load; declining cookies only switches off advertising.**
 
-| Tag | ID | Notes |
+- **Consent Mode v2 default** — `consentModeDefault` in `src/app/lib/consent.ts`, rendered as the first `<script>` in `<head>` (`layout.tsx`) before any Google tag: `analytics_storage` **granted** (denied only if the visitor chose *Turn off analytics cookies*); `ad_storage`, `ad_user_data`, `ad_personalization` **denied** until *Accept all* (granted on load for a returning visitor who accepted). Also sets `url_passthrough` and `ads_data_redaction`.
+- **GTM + GA4** — loaded by `src/app/components/Analytics.tsx` on every page for every visitor, not behind the banner. GA4 is configured there only, with `allow_google_signals: false` and `allow_ad_personalization_signals: false`.
+- **Meta Pixel / any ad tag** — consent-gated: loads only after *Accept all* (`CookieConsent.tsx` sets `window.__OLDHAM_CONSENT__` and dispatches an `oldham-consent` event).
+- **Banner** (`CookieConsent.tsx`) — *Decline advertising* / *Accept all* buttons and a *Turn off analytics cookies* link. The choice is stored in localStorage `oldham-cookie-consent`: `accepted` (analytics + ads), `declined` (analytics only; legacy `deny` is read the same way), `deny_all` (nothing). Withdrawing a more permissive choice sends a Google consent update to denied first, clears `_gcl*` / `_fbp` / `_fbc` (plus `_ga*` for `deny_all`) on the host and parent domain, then reloads. A first-time Decline needs no reload. The footer **Cookie settings** link (`data-cookie-settings`) reopens the banner.
+- **GA4 property (admin, not code):** Google signals **off**, ads personalisation **off**, data sharing **off** — required for the analytics exemption to hold.
+
+| Tag | ID | Loads |
 |---|---|---|
-| Google Tag Manager | `GTM-TRC7LX45` | container |
-| GA4 (gtag) | `G-FGG9MW14XY` | direct config, fires alongside GTM |
-| Meta Pixel | _(none)_ | only if `NEXT_PUBLIC_META_PIXEL_ID` is set |
+| Google Tag Manager | `GTM-TRC7LX45` | every visitor (container holds GA4 event tags only) |
+| GA4 (gtag) | `G-FGG9MW14XY` | every visitor; direct config, the only GA4 config |
+| Meta Pixel | _(none)_ | after Accept, only if `NEXT_PUBLIC_META_PIXEL_ID` is set |
 
 Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loaders point at the same-origin `/v2ur` path, which `vercel.json` rewrites to `gtm-trc7lx45.fps.goog` (+ `Host` and `X-Gtg-Developer-Id: dMjAzY2` headers). This dodges Safari/ITP third-party blocking (~11% better signal per Google). Mode A (`trailingSlash:false`): GTM loader → `/v2ur?id=`, gtag loader → `/v2ur/gtag/js?id=`. A bare `/v2ur/` 308-redirects under `trailingSlash:false` and carries no `?id=`, so it must not be used for gtag.
 
@@ -143,7 +149,7 @@ Both Google tags load **first-party via Google Tag Gateway (GTG)** — the loade
 
 > **Debugging tags — use Realtime or GTM Preview, not DebugView.** Verified 2026-09-11: GA4's DebugView only honours the `_dbg=1` flag, which gtag does not emit here (it sends `ep.debug_mode=true`), and hits carrying `_dbg=1` through the Tag Gateway did not surface either. The Realtime report works correctly and shows `page_view`, `session_start` and `click_to_call` as they happen. `?ga_debug=1` still marks this browser's hits with a `debug_mode` parameter (clear with `?ga_debug=0`), which is handy for spotting your own test traffic.
 
-> **No GTM `<noscript>` iframe:** GTG does not serve `ns.html` (404), and it would fire pre-consent. Consent needs JS anyway.
+> **No GTM `<noscript>` iframe:** GTG does not serve `ns.html` (404), so JS-disabled visitors are not measured.
 
 **GTG post-deploy validation** (all must pass):
 ```bash
@@ -203,7 +209,7 @@ vercel.json                         # GTG /v2ur rewrites → gtm-trc7lx45.fps.go
 .env.example                        # env var reference (proxied mode + analytics)
 src/app/
   page.tsx                          # Homepage
-  layout.tsx                        # Root layout (header, footer, GTM noscript, Analytics, attribution)
+  layout.tsx                        # Root layout (consent default in <head>, header, footer, Analytics, attribution)
   globals.css                       # Global styles
   inner-page.css                    # Inner page shared styles
   contact/
@@ -218,8 +224,8 @@ src/app/
     html-to-pdf/generate/route.ts
   components/
     SiteHeader.tsx, SiteFooter.tsx, VisitSection.tsx, ...
-    CookieConsent.tsx               # Consent banner (gates analytics)
-    Analytics.tsx                   # Consent-gated GTM + GA4 + Meta Pixel via GTG
+    CookieConsent.tsx               # Consent banner (gates advertising; analytics always on unless turned off)
+    Analytics.tsx                   # GTM + GA4 for every visitor via GTG; consent-gated Meta Pixel
     inner/
       ConsultBannerForm.tsx         # Reusable inline consultation banner (.ajax_form)
   lib/
@@ -247,7 +253,7 @@ public/
 - [x] **Honeypots + UTM hidden fields added to each form**
 - [x] **Thank-you pages live** (`/contact-thank-you`, `/consultation-thank-you`, `/referral-thank-you`)
 - [x] **PRM proxy (proxied mode)** — forms POST same-origin to `/api/prm/*`; TDS key server-side only
-- [x] **Analytics** — consent-gated GTM (`GTM-TRC7LX45`) + GA4 (`G-FGG9MW14XY`), first-party via GTG
+- [x] **Analytics** — GTM (`GTM-TRC7LX45`) + GA4 (`G-FGG9MW14XY`) for every visitor under Consent Mode v2 (fleet standard, Nov 2026), first-party via GTG
 - [x] **PRM/GA4 attribution** — `/js/prm-attribution.js` feeding `custom14`–`custom20`
 - [x] **Dynamic sitemap + robots** audited (all indexable routes, thank-you/template excluded)
 - [x] **Canonical domain = www** (metadata, sitemap, robots, schema all use `https://www.oldhamorthodontics.co.uk`)

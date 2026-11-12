@@ -2126,6 +2126,24 @@ section {
   color: var(--navy);
 }
 
+/* "Cookie settings" reopens the consent banner; styled to match the legal links. */
+.minimal-footer-cookie-settings {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--text-light);
+  letter-spacing: 0.5px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.minimal-footer-cookie-settings:hover {
+  color: var(--navy);
+}
+
 .minimal-footer-legal span {
   color: var(--text-light);
   font-size: 11px;
@@ -3035,6 +3053,16 @@ section {
 .cookie-consent-text a {
   color: var(--gold-start, #D4B86A);
   text-decoration: underline;
+}
+
+.cookie-consent-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--gold-start, #D4B86A);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .cookie-consent-actions {

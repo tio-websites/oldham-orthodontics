@@ -38,6 +38,10 @@ export default function SiteFooter() {
             <a href="/terms-and-conditions">TERMS &amp; CONDITIONS</a>
             <span>|</span>
             <a href="/cookies-policy">COOKIES POLICY</a>
+            <span>|</span>
+            <button type="button" className="minimal-footer-cookie-settings" data-cookie-settings>
+              COOKIE SETTINGS
+            </button>
           </div>
         </div>
       </div>
